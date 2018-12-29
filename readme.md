@@ -1,6 +1,7 @@
 # 生信Linux常用系统操作
 
 > Created by Yunze Liu (Reed Liu)
+>
 > 整理的都是日常很好用但又不容易记住的
 > 许多命令详情可以在[命令大全] (http://man.linuxde.net) 中搜索
 
