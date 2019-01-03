@@ -7,6 +7,8 @@
 
 #### 关于linux系统 
 
+##### 查看操作系统相关
+
 ```shell
 lsb_release -a #然后得到详细系统版本
 LSB Version:	:core-4.1-amd64:core-4.1-noarch
@@ -28,6 +30,8 @@ cat /proc/cpuinfo| grep process | wc -l  # 查看CPU个数
 env                    # 查看环境变量
 ```
 
+##### 任务管理器
+
 ```shell
 # linux上的任务管理器
 ps -ef
@@ -35,10 +39,14 @@ ps -ef
 ps -ef | grep "sra"
 ```
 
+##### 批量kill进程
+
 ```shell
 #批量kill进程
 ps -ef | grep "sra" | awk '{print $2}' | while read id;do kill $id; done
 ```
+
+##### 后缀
 
 ```shell
 #basename命令格式：
@@ -53,7 +61,17 @@ $ basename /tmp/test/file.txt .txt
 file
 ```
 
+##### 查看用户使用时限
 
+```shell
+$ chage -l username 
+```
+
+##### 服务器迁移数据
+
+```shell
+$ rsync -avz  username@login1:/home/username/xxx /home/username/ 
+```
 
 #### 小命令：
 
