@@ -429,7 +429,9 @@ cat file.fq | awk 'NR%4==0' | tr -d '\n' | hexdump -v -e'/1 "%u\n"' | sort -nu
 
 - 找到匹配模式后打印前后几行：`zcat *.gz| grep -B1 -A2 CACAATGTTT ` 表示匹配到CACAATGTTT后再打印前1行（B1）和后两行（A2）
 
+#### awk
 
+- NR表示行数，NF表示列数：`awk 'NR > 1 && NF == 4' data.txt` 略过第一行，只对第四列处理
 
 
 
@@ -438,3 +440,5 @@ cat file.fq | awk 'NR%4==0' | tr -d '\n' | hexdump -v -e'/1 "%u\n"' | sort -nu
 参考：
 
 https://ucdavis-bioinformatics-training.github.io/2018-March-Bioinformatics-Prerequisites/tuesday/advanced-command-line.html
+
+http://williamslab.bscb.cornell.edu/?page_id=235
