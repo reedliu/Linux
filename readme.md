@@ -5,9 +5,9 @@
 > 整理的都是日常很好用但又不容易记住的
 > 许多命令详情可以在[命令大全] (http://man.linuxde.net) 中搜索
 
-#### 关于linux系统 
+### 关于linux系统 
 
-##### 查看操作系统相关
+#### 查看操作系统相关
 
 ```shell
 lsb_release -a #然后得到详细系统版本
@@ -30,7 +30,7 @@ cat /proc/cpuinfo| grep process | wc -l  # 查看CPU个数
 env                    # 查看环境变量
 ```
 
-##### 任务管理器
+#### 任务管理器
 
 ```shell
 # linux上的任务管理器
@@ -39,14 +39,14 @@ ps -ef
 ps -ef | grep "sra"
 ```
 
-##### 批量kill进程
+#### 批量kill进程
 
 ```shell
 #批量kill进程
 ps -ef | grep "sra" | awk '{print $2}' | while read id;do kill $id; done
 ```
 
-##### 后缀
+#### 后缀
 
 ```shell
 #basename命令格式：
@@ -61,13 +61,13 @@ $ basename /tmp/test/file.txt .txt
 file
 ```
 
-##### 查看用户使用时限
+#### 查看用户使用时限
 
 ```shell
 $ chage -l username 
 ```
 
-##### 服务器迁移数据
+#### 服务器迁移数据
 
 ```shell
 $ rsync -avz  username@login1:/home/username/xxx /home/username/ 
@@ -125,6 +125,17 @@ welcome haha
 > **Unicode编码**中，一个英文两个字节，一个中文两个字节；英文标点占一个字节，中文标识占两个
 > **UTF-16编码**中， 英文与中文都要两个字节
 > **UTF-32编码**中，任何字符都要4个字节
+
+##### 查找指定文件并统计行数：
+
+```shell
+find /PATH/genomes -name "*.fa" -exec wc -l {} \;
+# 查看所有fa文件的行数
+# -exec 表示执行命令（execute）
+# {}表示前面找到的fa文件
+# 等同于：
+find /PATH/genomes -name "*.fa" | xargs wc -l
+```
 
 ####  进程管理：
 
@@ -407,3 +418,23 @@ cat file.fq | awk 'NR%4==0' | tr -d '\n' | hexdump -v -e'/1 "%u\n"' | sort -nu
 
 输出结果 **33-93** (Sanger/Illumina1.8), **64-104**(Illumina1.3 or Illumina1.5) and **59-104** (Solexa)
 
+### sed
+
+- 取出想要的行：`sed '4q;d' file` 取出第四行
+- 删除空行以及有空格的行：`sed -e '/^$/d' -e '/\s/d' file`
+- 全局替换用g，忽略大小写用i，-i表示修改源文件`sed -i 's/Re/Ma/gi' file` 【如果只想看看结果不修改源文件，去掉-i】
+- sed默认打印所有的行，使用-n指定打印行号，如打印前四行：`sed -n '1~4p' file`   
+
+#### grep
+
+- 找到匹配模式后打印前后几行：`zcat *.gz| grep -B1 -A2 CACAATGTTT ` 表示匹配到CACAATGTTT后再打印前1行（B1）和后两行（A2）
+
+
+
+
+
+
+
+参考：
+
+https://ucdavis-bioinformatics-training.github.io/2018-March-Bioinformatics-Prerequisites/tuesday/advanced-command-line.html
