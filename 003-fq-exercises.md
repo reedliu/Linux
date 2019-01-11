@@ -153,7 +153,9 @@ UMI_GGTCAA
 
 > 比较以上三种方法，可以发现：substr使用最灵活，可以按字符提取，其他两种需要指定分隔符
 
-**进阶：**利用`substr`，就可以整出来一个小的fq文件（比如trim掉前10bp的序列，注意质量序列也需要trim 前10个字符）
+### 进阶
+
+**进阶一：**利用`substr`，就可以整出来一个小的fq文件（比如trim掉前10bp的序列，注意质量序列也需要trim 前10个字符）
 
 ```shell
 $ awk 'NR % 4 ==1 {print $0}; NR % 4==2 {print substr($0, 10,length($0))}; NR % 4 ==3 {print $0}; NR % 4 ==0 {print substr($0, 10,length($0))}' SP1.fq | head
@@ -169,7 +171,7 @@ AATACTCTCCGAACGGGAGAGC
 GATCATTTTATTGAAGAGCAAG
 ```
 
-**进阶：**利用awk将fq转为fa
+**进阶二：**利用awk将fq转为fa
 
 ```shell
 # 如果只是加一个">"，那么还带着fastq标识符@是不对的
@@ -184,7 +186,7 @@ TATCCTTGCAATACTCTCCGAACGGGAGAGC
 
 > 当转成fasta后，就可以用`grep -c ">"` 来统计序列的数目了
 
-**进阶：**从fasta中找到至少四个A的序列，并显示是序列名称
+**进阶三：**从fasta中找到至少四个A的序列，并显示是序列名称
 
 ```shell
 # 首先要构建一个名称+fa序列的子文件，然后再查找，注意grep的-B表示打印匹配行的前一行；-A表示打印匹配行的后一行
@@ -221,3 +223,7 @@ https://likegeeks.com/awk-command/
 关于grep打印上下行
 
 https://stackoverflow.com/questions/1072643/how-can-i-make-grep-print-the-lines-below-and-above-each-matching-line
+
+关于匹配多项
+
+https://www.unix.com/unix-for-advanced-and-expert-users/175146-grep-2-string-operator.html
