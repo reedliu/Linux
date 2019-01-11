@@ -171,7 +171,38 @@ GATCATTTTATTGAAGAGCAAG
 
 **进阶：**利用awk将fq转为fa
 
+```shell
+# 如果只是加一个">"，那么还带着fastq标识符@是不对的
+$ awk 'NR %4==1 {print ">"$1}; NR%4==2 {print}' SP1.fq | head
+# 因此可以用substr来取
+$ awk 'NR %4==1 {print ">"substr($0,2,length($0))}; NR%4==2 {print}' SP1.fq | head -4
+>cluster_2:UMI_ATTCCG
+TTTCCGGGGCACATAATCTTCAGCCGGGCGC
+>cluster_8:UMI_CTTTGA
+TATCCTTGCAATACTCTCCGAACGGGAGAGC
+```
 
+> 当转成fasta后，就可以用`grep -c ">"` 来统计序列的数目了
+
+**进阶：**从fasta中找到至少四个A的序列，并显示是序列名称
+
+```shell
+# 首先要构建一个名称+fa序列的子文件，然后再查找，注意grep的-B表示打印匹配行的前一行；-A表示打印匹配行的后一行
+$ awk 'NR % 4 ==1 {print $0}; NR % 4 ==2 {print $0}' SP1.fq | egrep "A{4,}" -B1
+```
+
+上面的结果中的四个A都是序列中的吗？会不会在名称中也抓取到了`AAAA`？
+因此想要看看是否在名称中出现四个A：
+
+```shell
+# 利用awk实现
+$ awk 'NR % 4 ==1 {print $0}; NR % 4 ==2 {print $0}' SP1.fq | awk '/UMI/ && /AAAA/'
+# 利用grep实现
+$ awk 'NR % 4 ==1 {print $0}; NR % 4 ==2 {print $0}' SP1.fq | egrep "UMI.*AAAA"
+
+@cluster_252:UMI_CAAAAG
+#还真的有一个！
+```
 
 
 
@@ -186,3 +217,7 @@ https://unix.stackexchange.com/questions/119907/begin-and-end-with-the-awk-comma
 关于awk
 
 https://likegeeks.com/awk-command/
+
+关于grep打印上下行
+
+https://stackoverflow.com/questions/1072643/how-can-i-make-grep-print-the-lines-below-and-above-each-matching-line
