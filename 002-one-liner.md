@@ -3,6 +3,7 @@
 > Reed Liu created on 2019.1.11
 >
 > This is my collection of useful linux one-liners in daily work
+> <https://github.com/stephenturner/oneliners>
 
 ### About Fastq/fasta
 
@@ -113,7 +114,43 @@ rsync -av from_dir/ to_dir
 rsync -avhP from_dir/ to_dir
 ```
 
-##### delete with sed
+##### find bam in the current folder recursively and copy them to a new dir with 5 CPUs => 拷贝大文件（如bam）到其他文件夹，并用5个线程
+
+```shell
+find . -name "*bam" | xargs -P5 -I{} rsync -av {} dest_dir
+```
+
+##### group files by extensions => 按照后缀的顺序排序文件
+
+```shell
+ll -X
+```
+
+##### loop through all the names => 循环语句
+
+```shell
+for i in {1..22} X Y 
+do
+  echo $i
+done
+# 对于{01..22} 的结果是 01 02 ...
+```
+
+
+
+### GREP
+
+##### grep fastq reads containing a pattern but maintain the fastq format => 匹配fq中序列并打印
+
+```shell
+# 例如要在SP1.fq中找到这段序列的fq格式
+# 如果匹配到多个，那么每条序列中间会用--分隔，因此需要用sed去除
+$ grep -A 2 -B 1 'TGAGACAACATCT' SP1.fq | sed '/^--$/d' > out.fq
+```
+
+### SED 
+
+##### delete with sed => 删除行
 
 ```shell
 # delete blank lines
@@ -121,6 +158,8 @@ sed /^$/d
 # delete the last line
 sed $d
 ```
+
+### AWK 
 
 ##### awk join two files with common columns => awk连接有共同列的文件（类似于R的merge函数）
 
@@ -137,5 +176,78 @@ yyyy	defg	chr1	345	aa	e	f	g
 # 现在想在a的基础上根据a、b共有列来增加b中的新内容
 $ awk 'NR==FNR{a[$3,$4,$5]=$1OFS$2;next}{$6=a[$1,$2,$3];print}' OFS='\t' \
 file_b.bed file_a.bed
+
+# 结果
+chr1	123	aa	b	c	xxxx	abcd
+chr1	234	a	b	c	
+chr1	345	aa	b	c	yyyy	defg
+chr1	456	a	b	c	
 ```
 
+> Explanation:
+>
+> - **NR==FNR** NR is the current input line number and FNR the current file's line number. The two will be equal only while the 1st file is being read.
+> - **OFS**  awk set the output field seperator; while set the input seperator is **-F** 
+> - **next** means to proceed for the next line, rather than execute the following { } code block
+
+##### awk to compare two different files and print if matches=> 比较两个文件的指定列，然后打印比对上的行
+
+```shell
+# https://unix.stackexchange.com/questions/134829/compare-two-columns-of-different-files-and-print-if-it-matches
+# 例如 file1
+abc|123|BNY|apple|
+cab|234|cyx|orange|
+def|kumar|pki|bird|
+# file2
+abc|123|
+kumar|pki|
+cab|234
+# expected
+abc|123|BNY|apple|
+cab|234|cyx|orange|
+
+$  awk -F'|' 'NR==FNR{a[$1$2]++;next};a[$1$2] > 0' file2 file1
+```
+
+##### conditional operator => 条件判断
+
+基本格式：`var=condition?condition_if_true:condition_if_false`
+
+例如：
+
+```shell
+# 现在有这个文件 test
+a1	ACTGTCTGTCACTGTGTTGTGATGTTG
+a2	ACTTTATATAT
+a3	ACTTATATATATATA
+a4	ACTTATATATATATA
+a5	ACTTTATATATT	
+# 我想看看每行序列部分是不是大于14个碱基
+$ awk '{print (length($2)>14)?$0">14":$0"<=14"}' test
+```
+
+##### get new line => 在原来的内容基础上增加新内容
+
+```shell
+$ awk 'BEGIN{while((getline k <"test")>0) print "NEW:"k}{print}' test
+```
+
+##### merge multi-fasta into one single fasta => 合并多个fasta文件到一个文件中
+
+```shell
+# give a awk script called linearize.awk
+$cat >linearize.awk 
+# then copy and paste below
+/^>/ {printf("%s%s\t",(N>0?"\n":""),$0);N++;next;} {printf("%s",$0);} END {printf("\n");}
+
+# run the awk script
+$ paste <(awk -f linearize.awk file1.fa ) <(awk -f linearize.awk file2.fa  )| tr "\t" "\n" > multi.fa
+```
+
+##### 根据id输出序列
+
+```shell
+while read -r line; do awk -v pattern=$line -v RS=">" '$0 ~ pattern { printf(">%s", $0); }'  Seq.fasta; done < id.txt > output.fa 
+```
+
+需要指定Seq.fasta、id.txt
